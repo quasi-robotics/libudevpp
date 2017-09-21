@@ -82,6 +82,8 @@ for(;;)
 }
 ```
 
+See also: [libudev and Sysfs Tutorial](http://www.signal11.us/oss/udev/)
+
 ## Authors
 
 * **Dimitry Ishenko** - dimitry (dot) ishenko (at) (gee) mail (dot) com
