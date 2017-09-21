@@ -36,9 +36,6 @@ public:
     udev& operator=(const udev&) = delete;
     udev& operator=(udev&&) = delete;
 
-    ////////////////////
-    bool valid() const noexcept { return udev_; }
-
 private:
     ////////////////////
     detail::udev* udev_;
