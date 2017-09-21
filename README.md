@@ -48,13 +48,7 @@ for(;;)
     using namespace std::chrono_literals;
     using namespace std;
 
-    auto dev = mon.try_get_for(30s)
-    if(!dev.valid())
-    {
-        cout << "Nothing seems to be happening" << endl;
-        break;
-    }
-    else
+    if(auto dev = mon.try_get_for(30s))
     {
         switch(dev.action())
         {
@@ -79,6 +73,11 @@ for(;;)
             }
             break;
         }
+    }
+    else
+    {
+        cout << "Nothing seems to be happening" << endl;
+        break;
     }
 }
 ```
