@@ -43,8 +43,6 @@ public:
     enumerate& operator=(enumerate&&) = delete;
 
     ////////////////////
-    bool valid() const noexcept { return enum_; }
-
     void match_subsystem(const std::string&);
     void nomatch_subsystem(const std::string&);
 
