@@ -50,6 +50,7 @@ public:
 
     ////////////////////
     bool valid() const noexcept { return dev_; }
+    explicit operator bool() const noexcept { return valid(); }
 
     device parent() const noexcept;
     device parent(const std::string& subsystem, const std::string& type = std::string()) const noexcept;
