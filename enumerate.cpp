@@ -103,7 +103,7 @@ void enumerate::match_tag(const std::string& name)
 void enumerate::match_parent(const device& dev)
 {
     throw_on(detail::udev_enumerate_add_match_parent(
-        enum_.get(), dev.dev_
+        enum_.get(), dev.dev_.get()
     ));
 }
 
@@ -117,7 +117,7 @@ std::vector<device> enumerate::get()
     udev_list_entry_foreach(e, detail::udev_enumerate_get_list_entry(enum_.get()))
     {
         if(auto path = detail::udev_list_entry_get_name(e))
-            devices.push_back(device::from_path(udev_.get(), path));
+            devices.push_back(device(udev_, path));
     }
 
     return devices;
