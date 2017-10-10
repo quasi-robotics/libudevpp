@@ -16,7 +16,7 @@ git submodule add https://github.com/dimitry-ishenko/udev.git
 
 ### Usage
 
-Example:
+Example 1:
 
 ```cpp
 udev::enumerate enu;
@@ -38,8 +38,11 @@ for(auto const& dev : devices)
         cout << endl;
     }
 }
+```
 
-////////////////////
+Example 2:
+
+```cpp
 udev::monitor mon;
 mon.match_device("block");
 
