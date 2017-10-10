@@ -15,6 +15,8 @@ namespace detail
 // move udev stuff into detail namespace 8-o
 #include <libudev.h>
 
+void enumerate_delete::operator()(udev_enumerate* x) { udev_enumerate_unref(x); }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -42,13 +44,10 @@ enumerate::enumerate() : udev_(udev::instance()),
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-enumerate::~enumerate() noexcept { detail::udev_enumerate_unref(enum_); }
-
-////////////////////////////////////////////////////////////////////////////////
 void enumerate::match_subsystem(const std::string& subsystem)
 {
     throw_on(detail::udev_enumerate_add_match_subsystem(
-        enum_, subsystem.data()
+        enum_.get(), subsystem.data()
     ));
 }
 
@@ -56,7 +55,7 @@ void enumerate::match_subsystem(const std::string& subsystem)
 void enumerate::nomatch_subsystem(const std::string& subsystem)
 {
     throw_on(detail::udev_enumerate_add_nomatch_subsystem(
-        enum_, subsystem.data()
+        enum_.get(), subsystem.data()
     ));
 }
 
@@ -64,7 +63,7 @@ void enumerate::nomatch_subsystem(const std::string& subsystem)
 void enumerate::match_attribute(const std::string& name, const std::string& value)
 {
     throw_on(detail::udev_enumerate_add_match_sysattr(
-        enum_, name.data(), value.size() ? value.data() : nullptr
+        enum_.get(), name.data(), value.size() ? value.data() : nullptr
     ));
 }
 
@@ -72,7 +71,7 @@ void enumerate::match_attribute(const std::string& name, const std::string& valu
 void enumerate::nomatch_attribute(const std::string& name, const std::string& value)
 {
     throw_on(detail::udev_enumerate_add_nomatch_sysattr(
-        enum_, name.data(), value.size() ? value.data() : nullptr
+        enum_.get(), name.data(), value.size() ? value.data() : nullptr
     ));
 }
 
@@ -80,7 +79,7 @@ void enumerate::nomatch_attribute(const std::string& name, const std::string& va
 void enumerate::match_property(const std::string& name, const std::string& value)
 {
     throw_on(detail::udev_enumerate_add_match_property(
-        enum_, name.data(), value.size() ? value.data() : nullptr
+        enum_.get(), name.data(), value.size() ? value.data() : nullptr
     ));
 }
 
@@ -88,7 +87,7 @@ void enumerate::match_property(const std::string& name, const std::string& value
 void enumerate::match_name(const std::string& name)
 {
     throw_on(detail::udev_enumerate_add_match_sysname(
-        enum_, name.data()
+        enum_.get(), name.data()
     ));
 }
 
@@ -96,7 +95,7 @@ void enumerate::match_name(const std::string& name)
 void enumerate::match_tag(const std::string& name)
 {
     throw_on(detail::udev_enumerate_add_match_tag(
-        enum_, name.data()
+        enum_.get(), name.data()
     ));
 }
 
@@ -104,7 +103,7 @@ void enumerate::match_tag(const std::string& name)
 void enumerate::match_parent(const device& dev)
 {
     throw_on(detail::udev_enumerate_add_match_parent(
-        enum_, dev.dev_
+        enum_.get(), dev.dev_
     ));
 }
 
@@ -112,10 +111,10 @@ void enumerate::match_parent(const device& dev)
 std::vector<device> enumerate::get()
 {
     std::vector<device> devices;
-    throw_on(detail::udev_enumerate_scan_devices(enum_));
+    throw_on(detail::udev_enumerate_scan_devices(enum_.get()));
 
     detail::udev_list_entry* e;
-    udev_list_entry_foreach(e, detail::udev_enumerate_get_list_entry(enum_))
+    udev_list_entry_foreach(e, detail::udev_enumerate_get_list_entry(enum_.get()))
     {
         if(auto path = detail::udev_list_entry_get_name(e))
             devices.push_back(device::from_path(udev_.get(), path));

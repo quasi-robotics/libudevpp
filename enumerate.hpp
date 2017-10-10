@@ -12,11 +12,17 @@
 #include "udev/device.hpp"
 #include "udev/udev.hpp"
 
+#include <memory>
 #include <string>
-#include <utility> // std::swap
 #include <vector>
 
-namespace detail { struct udev_enumerate; }
+namespace detail
+{
+
+struct udev_enumerate;
+struct enumerate_delete { void operator()(udev_enumerate*); };
+
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace udev
@@ -34,13 +40,12 @@ class enumerate
 public:
     ////////////////////
     enumerate();
-    ~enumerate() noexcept;
 
     enumerate(const enumerate&) = delete;
-    enumerate(enumerate&&) = delete;
+    enumerate(enumerate&&) noexcept = default;
 
     enumerate& operator=(const enumerate&) = delete;
-    enumerate& operator=(enumerate&&) = delete;
+    enumerate& operator=(enumerate&&) noexcept = default;
 
     ////////////////////
     void match_subsystem(const std::string&);
@@ -62,7 +67,7 @@ public:
 private:
     ////////////////////
     udev udev_;
-    detail::udev_enumerate* enum_;
+    std::unique_ptr<detail::udev_enumerate, detail::enumerate_delete> enum_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
