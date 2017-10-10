@@ -14,10 +14,16 @@
 #include "udev/udev.hpp"
 
 #include <chrono>
+#include <memory>
 #include <string>
-#include <utility> // std::swap
 
-namespace detail { struct udev_monitor; }
+namespace detail
+{
+
+struct udev_monitor;
+struct monitor_delete { void operator()(udev_monitor*); };
+
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace udev
@@ -38,17 +44,14 @@ class monitor
 public:
     ////////////////////
     monitor();
-    ~monitor() noexcept;
 
     monitor(const monitor&) = delete;
-    monitor(monitor&&) = delete;
+    monitor(monitor&&) noexcept = default;
 
     monitor& operator=(const monitor&) = delete;
-    monitor& operator=(monitor&&) = delete;
+    monitor& operator=(monitor&&) noexcept = default;
 
     ////////////////////
-    bool valid() const noexcept { return mon_; }
-
     void match_device(const std::string& subsystem, const std::string& type = std::string());
     void match_tag(const std::string&);
 
@@ -74,7 +77,7 @@ public:
 private:
     ////////////////////
     udev udev_;
-    detail::udev_monitor* mon_;
+    std::unique_ptr<detail::udev_monitor, detail::monitor_delete> mon_;
     posix::resource res_;
 
     using msec = std::chrono::milliseconds;
