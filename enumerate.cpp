@@ -35,8 +35,8 @@ namespace udev
 {
 
 ////////////////////////////////////////////////////////////////////////////////
-enumerate::enumerate() :
-    enum_(detail::udev_enumerate_new(udev_.udev_))
+enumerate::enumerate() : udev_(udev::instance()),
+    enum_(detail::udev_enumerate_new(udev_.get()))
 {
     if(!enum_) throw posix::errno_error();
 }
@@ -118,7 +118,7 @@ std::vector<device> enumerate::get()
     udev_list_entry_foreach(e, detail::udev_enumerate_get_list_entry(enum_))
     {
         if(auto path = detail::udev_list_entry_get_name(e))
-            devices.push_back(device::from_path(udev_.udev_, path));
+            devices.push_back(device::from_path(udev_.get(), path));
     }
 
     return devices;

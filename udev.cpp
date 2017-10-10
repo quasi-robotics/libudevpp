@@ -8,6 +8,8 @@
 #include "posix/error.hpp"
 #include "udev/udev.hpp"
 
+#include <memory>
+
 ////////////////////////////////////////////////////////////////////////////////
 namespace detail
 {
@@ -18,10 +20,21 @@ namespace detail
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-udev::udev::udev() : udev_(detail::udev_new())
+udev::udev udev::udev::instance()
 {
-    if(!udev_) throw posix::errno_error();
-}
+    static std::weak_ptr<detail::udev> weak;
 
-////////////////////////////////////////////////////////////////////////////////
-udev::udev::~udev() noexcept { detail::udev_unref(udev_); }
+    auto strong = weak.lock();
+    if(!strong)
+    {
+        strong = std::shared_ptr<detail::udev>(
+            detail::udev_new(),
+            &detail::udev_unref
+        );
+        if(!strong) throw posix::errno_error();
+
+        weak = strong;
+    }
+
+    return udev(std::move(strong));
+}

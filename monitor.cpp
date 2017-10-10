@@ -35,8 +35,8 @@ namespace udev
 {
 
 ////////////////////////////////////////////////////////////////////////////////
-monitor::monitor() :
-    mon_(detail::udev_monitor_new_from_netlink(udev_.udev_, "udev"))
+monitor::monitor() : udev_(udev::instance()),
+    mon_(detail::udev_monitor_new_from_netlink(udev_.get(), "udev"))
 {
     if(!mon_) throw posix::errno_error();
 }

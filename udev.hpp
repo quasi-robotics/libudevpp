@@ -9,17 +9,16 @@
 #define UDEV_UDEV_HPP
 
 ////////////////////////////////////////////////////////////////////////////////
+#include <memory>
+
 namespace detail { struct udev; }
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace udev
 {
 
-class enumerate;
-class monitor;
-
 ////////////////////////////////////////////////////////////////////////////////
-// The udev.
+// Udev context.
 //
 // Used by the enumerate and monitor classes to get access to udev.
 //
@@ -27,21 +26,20 @@ class udev
 {
 public:
     ////////////////////
-    udev();
-    ~udev() noexcept;
+    udev(const udev&) noexcept = default;
+    udev(udev&&) noexcept = default;
 
-    udev(const udev&) = delete;
-    udev(udev&&) = delete;
+    udev& operator=(const udev&) noexcept = default;
+    udev& operator=(udev&&) noexcept = default;
 
-    udev& operator=(const udev&) = delete;
-    udev& operator=(udev&&) = delete;
+    ////////////////////
+    static udev instance();
+    auto get() const noexcept { return udev_.get(); }
 
 private:
     ////////////////////
-    detail::udev* udev_;
-
-    friend class enumerate;
-    friend class monitor;
+    std::shared_ptr<detail::udev> udev_;
+    udev(std::shared_ptr<detail::udev> x) : udev_(std::move(x)) { }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
