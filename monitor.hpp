@@ -71,7 +71,7 @@ public:
     template<typename Clock, typename Duration>
     device try_get_until(const std::chrono::time_point<Clock, Duration>&);
 
-    // cancel pending wait [usually] from another thread
+    // cancel pending wait [typically] from another thread
     void cancel() noexcept { res_.cancel(); }
 
 private:
@@ -96,7 +96,10 @@ monitor::try_get_for(const std::chrono::duration<Rep, Period>& time)
 template<typename Clock, typename Duration>
 inline device
 monitor::try_get_until(const std::chrono::time_point<Clock, Duration>& tp)
-{ return try_get_for(tp - Clock::now()); }
+{
+    auto now = Clock::now();
+    return try_get_for(tp - (tp < now ? tp : now));
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 }
