@@ -5,16 +5,16 @@
 // Distributed under the GNU GPL license. See the LICENSE.md file for details.
 
 ////////////////////////////////////////////////////////////////////////////////
-#include "posix/error.hpp"
-#include "udev/udev.hpp"
+#include "udev.hpp"
 
-#include <memory>
+#include <cerrno>
+#include <system_error>
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace detail
+namespace impl
 {
 
-// move udev stuff into detail namespace 8-o
+// move udev stuff into impl namespace
 #include <libudev.h>
 
 }
@@ -22,19 +22,16 @@ namespace detail
 ////////////////////////////////////////////////////////////////////////////////
 udev::udev udev::udev::instance()
 {
-    static std::weak_ptr<detail::udev> weak;
+    static std::weak_ptr<impl::udev> weak;
 
-    auto strong = weak.lock();
-    if(!strong)
+    auto p = weak.lock();
+    if(!p)
     {
-        strong = std::shared_ptr<detail::udev>(
-            detail::udev_new(),
-            &detail::udev_unref
-        );
-        if(!strong) throw posix::errno_error();
-
-        weak = strong;
+        p = std::shared_ptr<impl::udev>{ impl::udev_new(), &impl::udev_unref };
+        if(!p) throw std::system_error{
+            std::error_code{ errno, std::generic_category() }
+        };
+        weak = p;
     }
-
-    return udev(std::move(strong));
+    return udev{ std::move(p) };
 }

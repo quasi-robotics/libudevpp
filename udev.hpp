@@ -11,7 +11,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include <memory>
 
-namespace detail { struct udev; }
+namespace impl { struct udev; }
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace udev
@@ -20,26 +20,23 @@ namespace udev
 ////////////////////////////////////////////////////////////////////////////////
 // Udev context.
 //
-// Used by the enumerate and monitor classes to get access to udev.
+// Used by the `enumerate` and `monitor` classes to get access to udev.
 //
 class udev
 {
 public:
-    ////////////////////
     udev(const udev&) noexcept = default;
     udev(udev&&) noexcept = default;
 
     udev& operator=(const udev&) noexcept = default;
     udev& operator=(udev&&) noexcept = default;
 
-    ////////////////////
     static udev instance();
     auto get() const noexcept { return udev_.get(); }
 
 private:
-    ////////////////////
-    std::shared_ptr<detail::udev> udev_;
-    udev(std::shared_ptr<detail::udev> x) : udev_(std::move(x)) { }
+    std::shared_ptr<impl::udev> udev_;
+    udev(std::shared_ptr<impl::udev> x) : udev_(std::move(x)) { }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
