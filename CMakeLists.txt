@@ -12,6 +12,8 @@ set(HEADERS
     monitor.hpp
     udev.hpp
 )
+set(OVERALL_HEADER udev++.hpp)
+
 set(SOURCES
     device.cpp
     enumerate.cpp
@@ -41,6 +43,7 @@ set_target_properties(static PROPERTIES OUTPUT_NAME ${LIBRARY_NAME})
 
 install(TARGETS static DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT static)
 install(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${LIBRARY_NAME} COMPONENT static)
+install(FILES ${OVERALL_HEADER} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT static)
 install(FILES LICENSE.md README.md DESTINATION ${CMAKE_INSTALL_DOCDIR_DEV} COMPONENT static)
 
 ########################
