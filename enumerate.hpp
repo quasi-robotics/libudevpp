@@ -9,14 +9,14 @@
 #define UDEV_ENUMERATE_HPP
 
 ////////////////////////////////////////////////////////////////////////////////
-#include "udev/device.hpp"
-#include "udev/udev.hpp"
+#include "device.hpp"
+#include "udev.hpp"
 
 #include <memory>
 #include <string>
 #include <vector>
 
-namespace detail
+namespace impl
 {
 
 struct udev_enumerate;
@@ -31,14 +31,12 @@ namespace udev
 ////////////////////////////////////////////////////////////////////////////////
 // Udev device enumerator.
 //
-// As needed, call one or more of the match_*() functions
-// to only match specific devices. Then, call the get() function
-// to get a list of matching devices.
+// As needed, call one or more of the match_*() functions to only match specific
+// devices. Then, call the get() function to get a list of matching devices.
 //
 class enumerate
 {
 public:
-    ////////////////////
     enumerate();
 
     enumerate(const enumerate&) = delete;
@@ -47,27 +45,24 @@ public:
     enumerate& operator=(const enumerate&) = delete;
     enumerate& operator=(enumerate&&) noexcept = default;
 
-    ////////////////////
     void match_subsystem(const std::string&);
     void nomatch_subsystem(const std::string&);
 
-    void match_attribute(const std::string& name, const std::string& value = std::string());
-    void nomatch_attribute(const std::string& name, const std::string& value = std::string());
+    void match_sysattr(const std::string& name, const std::string& value = std::string());
+    void nomatch_sysattr(const std::string& name, const std::string& value = std::string());
 
     void match_property(const std::string& name, const std::string& value = std::string());
 
-    void match_name(const std::string&);
+    void match_sysname(const std::string&);
     void match_tag(const std::string&);
 
     void match_parent(const device&);
 
-    ////////////////////
     std::vector<device> get();
 
 private:
-    ////////////////////
     udev udev_;
-    std::unique_ptr<detail::udev_enumerate, detail::enumerate_delete> enum_;
+    std::unique_ptr<impl::udev_enumerate, impl::enumerate_delete> enum_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
