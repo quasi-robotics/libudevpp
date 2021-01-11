@@ -1,77 +1,136 @@
-# Library of udev related C++ classes
+# libudev++: Udev Library for C++
 
-## Getting Started
+The `libudev++` library is a C++ wrapper for
+[libudev](https://www.freedesktop.org/software/systemd/man/libudev.html).
+It enables one to enumerate, monitor and introspect devices on the local system.
+
+## Installation
 
 ### Prerequisites
 
-* libudev.so (provided by [systemd](https://www.freedesktop.org/wiki/Software/systemd/))
-* [Library of POSIX related C++ classes](https://github.com/dimitry-ishenko/posix)
+* libudev (provided by [systemd](https://www.freedesktop.org/wiki/Software/systemd/))
 
-### Installation
+### Binary
 
-Add as a submodule into an existing project:
+Debian/Ubuntu/etc:
+
+```console
+$ ver=0.0
+$ url=https://github.com/dimitry-ishenko-cpp/libudevpp/releases/download/v${ver}
+$ wget ${url}/libudev++_${ver}_amd64.deb
+$ sudo apt install ./libudev++_${ver}_amd64.deb
 ```
-git submodule add https://github.com/dimitry-ishenko/udev.git
+
+Install the development package, if you are planning to develop applications with `libudev++`:
+
+```console
+$ wget ${url}/libudev++-dev_${ver}_amd64.deb
+$ sudo apt install ./libudev++-dev_${ver}_amd64.deb
 ```
 
-### Usage
+RaspberryPi:
 
-Example 1:
+```console
+$ ver=0.0
+$ url=https://github.com/dimitry-ishenko-cpp/libudevpp/releases/download/v${ver}
+$ wget ${url}/libudev++_${ver}_armhf.deb
+$ sudo apt install ./libudev++_${ver}_armhf.deb
+```
+
+Install the development package, if you are planning to develop applications with `libudev++`:
+
+```console
+$ wget ${url}/libudev++-dev_${ver}_armhf.deb
+$ sudo apt install ./libudev++-dev_${ver}_armhf.deb
+```
+
+### From source
+
+Stable version (requires [CMake](https://cmake.org/) >= 3.1):
+
+```console
+$ ver=0.0
+$ wget https://github.com/dimitry-ishenko-cpp/libudevpp/archive/v${ver}.tar.gz
+$ tar xzf v${ver}.tar.gz
+$ mkdir libudevpp-${ver}/build
+$ cd libudevpp-${ver}/build
+$ cmake ..
+$ make
+$ sudo make install
+```
+
+Latest master (requires [git](https://git-scm.com/) and [CMake](https://cmake.org/) >= 3.1):
+
+```console
+$ git clone https://github.com/dimitry-ishenko-cpp/libudevpp.git
+$ mkdir libudevpp/build
+$ cd libudevpp/build
+$ cmake ..
+$ make
+$ sudo make install
+```
+
+## Developing with libudev++
+
+To develop with `libudev++` simply add `#include <udev++.hpp>` to your program
+and `-ludev++` to your linker. Following are a few examples demonstrating its
+capabilities:
+
+Example #1:
 
 ```cpp
-udev::enumerate enu;
-enu.match_subsystem("block");
+udev::enumerate enumerate;
+enumerate.match_subsystem("block");
 
-auto devices = enu.get();
-for(auto const& dev : devices)
+auto devices = enumerate.get();
+for(auto const& device : devices)
 {
     using namespace std;
 
-    if(dev.type() == "partition" && dev.property("ID_BUS") == "ata")
+    if(device.type() == "partition" && device.property("ID_BUS") == "ata")
     {
         cout << "Found hard disk" << endl
-             << "Path: " << dev.path() << endl
-             << "Node: " << dev.node() << endl
-             << "  FS: " << dev.property("ID_FS_TYPE") << endl
-             << "Name: " << dev.name() << endl
-             << "  No: " << dev.num () << endl;
+             << "Path: " << device.syspath() << endl
+             << "Node: " << device.devnode() << endl
+             << "  FS: " << device.property("ID_FS_TYPE") << endl
+             << "Name: " << device.sysname() << endl
+             << "   #: " << device.sysnum () << endl;
         cout << endl;
     }
 }
 ```
 
-Example 2:
-
+Example #2:
 ```cpp
-udev::monitor mon;
-mon.match_device("block");
+udev::monitor monitor;
+monitor.match_device("block");
 
 for(;;)
 {
     using namespace std::chrono_literals;
     using namespace std;
 
-    if(auto dev = mon.try_get_for(30s))
+    if(auto device = monitor.try_get_for(30s))
     {
-        switch(dev.action())
+        switch(device.action())
         {
         case udev::added:
-            if(dev.type() == "partition" && dev.property("ID_BUS") == "usb")
+            if(device.type() == "partition" && device.property("ID_BUS") == "usb")
             {
                 cout << "USB drive plugged in" << endl
-                     << "Path: " << dev.path() << endl
-                     << "Node: " << dev.node() << endl
-                     << "  FS: " << dev.property("ID_FS_TYPE") << endl
-                     << "Name: " << dev.name() << endl
-                     << "  No: " << dev.num () << endl;
+                     << "Path: " << device.syspath() << endl
+                     << "Node: " << device.devnode() << endl
+                     << "  FS: " << device.property("ID_FS_TYPE") << endl
+                     << "Name: " << device.sysname() << endl
+                     << "   #: " << device.sysnum () << endl;
                 cout << endl;
             }
             break;
 
         case udev::removed:
-            if(dev.type() == "partition" && dev.property("ID_BUS") == "usb")
+            if(device.type() == "partition" && device.property("ID_BUS") == "usb")
             {
-                cout << "USB drive " << dev.node() << " unplugged" << endl;
+                cout << "USB drive " << device.devnode() << " unplugged" << endl;
                 cout << endl;
             }
             break;
@@ -84,8 +143,6 @@ for(;;)
     }
 }
 ```
-
-See also: [libudev and Sysfs Tutorial](http://www.signal11.us/oss/udev/)
 
 ## Authors
 
