@@ -1,7 +1,3 @@
-*.config
-*.creator
-*.creator.user
-*.files
-*.includes
-build
-test/test
+build*
+*.user
+.vscode
