@@ -42,7 +42,7 @@ namespace udev
 
 ////////////////////////////////////////////////////////////////////////////////
 monitor::monitor() : udev_(udev::instance()),
-    mon_(impl::udev_monitor_new_from_netlink(udev_.get(), "udev"))
+    mon_{ impl::udev_monitor_new_from_netlink(udev_.get(), "udev") }
 {
     if(!mon_) throw std::system_error{
         std::error_code{ errno, std::generic_category() }
@@ -50,7 +50,7 @@ monitor::monitor() : udev_(udev::instance()),
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void monitor::match_device(const std::string& subsystem, const std::string& type)
+void monitor::match_device(const string& subsystem, const string& type)
 {
     throw_on(impl::udev_monitor_filter_add_match_subsystem_devtype(
         mon_.get(), subsystem.data(), type.size() ? type.data() : nullptr
@@ -58,7 +58,7 @@ void monitor::match_device(const std::string& subsystem, const std::string& type
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void monitor::match_tag(const std::string& name)
+void monitor::match_tag(const string& name)
 {
     throw_on(impl::udev_monitor_filter_add_match_tag(
         mon_.get(), name.data()

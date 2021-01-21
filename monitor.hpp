@@ -29,6 +29,8 @@ struct monitor_delete { void operator()(udev_monitor*); };
 namespace udev
 {
 
+using std::string;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Udev device addition/removal monitor.
 //
@@ -42,7 +44,7 @@ public:
     monitor();
 
     monitor(const monitor&) = delete;
-    monitor(monitor&& rhs) noexcept : monitor() { swap(rhs); }
+    monitor(monitor&& rhs) noexcept : monitor{ } { swap(rhs); }
 
     monitor& operator=(const monitor&) = delete;
     monitor& operator=(monitor&& rhs) noexcept { swap(rhs); return (*this); }
@@ -54,8 +56,8 @@ public:
         swap(fd_, rhs.fd_);
     }
 
-    void match_device(const std::string& subsystem, const std::string& type = std::string());
-    void match_tag(const std::string&);
+    void match_device(const string& subsystem, const string& type = { });
+    void match_tag(const string&);
 
     // NB: first call to any of the try_*() functions will put monitor into
     // "active" state and further calls to match_*() functions will be ignored
