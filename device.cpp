@@ -28,7 +28,7 @@ namespace
 
 auto str(const char* s) noexcept
 {
-    return s ? std::string(s) : std::string();
+    return s ? std::string{ s } : std::string{ };
 }
 
 }
@@ -38,8 +38,8 @@ namespace udev
 {
 
 ////////////////////////////////////////////////////////////////////////////////
-device::device(const udev& udev_, const std::string& path) :
-    dev_(impl::udev_device_new_from_syspath(udev_.get(), path.data()))
+device::device(const udev& udev_, const string& path) :
+    dev_{ impl::udev_device_new_from_syspath(udev_.get(), path.data()) }
 {
     if(!dev_) throw std::system_error{
         std::error_code{ errno, std::generic_category() }
@@ -62,7 +62,7 @@ device device::parent() const noexcept
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-device device::parent(const std::string& subsystem, const std::string& type) const noexcept
+device device::parent(const string& subsystem, const string& type) const noexcept
 {
     auto dev = impl::udev_device_get_parent_with_subsystem_devtype(dev_.get(),
         subsystem.data(), type.size() ? type.data() : nullptr
@@ -80,49 +80,49 @@ device device::parent(const std::string& subsystem, const std::string& type) con
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string device::subsystem() const noexcept
+string device::subsystem() const noexcept
 {
     return str(impl::udev_device_get_subsystem(dev_.get()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string device::devtype() const noexcept
+string device::devtype() const noexcept
 {
     return str(impl::udev_device_get_devtype(dev_.get()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string device::syspath() const noexcept
+string device::syspath() const noexcept
 {
     return str(impl::udev_device_get_syspath(dev_.get()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string device::sysname() const noexcept
+string device::sysname() const noexcept
 {
     return str(impl::udev_device_get_sysname(dev_.get()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string device::sysnum() const noexcept
+string device::sysnum() const noexcept
 {
     return str(impl::udev_device_get_sysnum(dev_.get()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string device::devnode() const noexcept
+string device::devnode() const noexcept
 {
     return str(impl::udev_device_get_devnode(dev_.get()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string device::property(const std::string& name) const noexcept
+string device::property(const string& name) const noexcept
 {
     return str(impl::udev_device_get_property_value(dev_.get(), name.data()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string device::driver() const noexcept
+string device::driver() const noexcept
 {
     return str(impl::udev_device_get_driver(dev_.get()));
 }
@@ -135,13 +135,13 @@ enum action device::action() const noexcept
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string device::sysattr(const std::string& name) const noexcept
+string device::sysattr(const string& name) const noexcept
 {
     return str(impl::udev_device_get_sysattr_value(dev_.get(), name.data()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool device::has_tag(const std::string& name) const noexcept
+bool device::has_tag(const string& name) const noexcept
 {
     return impl::udev_device_has_tag(dev_.get(), name.data());
 }

@@ -25,6 +25,8 @@ struct device_delete { void operator()(udev_device*); };
 namespace udev
 {
 
+using std::string;
+
 class enumerate;
 class monitor;
 class udev;
@@ -53,26 +55,26 @@ public:
     explicit operator bool() const noexcept { return is_valid(); }
 
     device parent() const noexcept;
-    device parent(const std::string& subsystem, const std::string& devtype = std::string()) const noexcept;
+    device parent(const string& subsystem, const string& devtype = { }) const noexcept;
 
-    std::string subsystem() const noexcept;
-    std::string   devtype() const noexcept;
-    std::string   syspath() const noexcept;
-    std::string   sysname() const noexcept;
-    std::string    sysnum() const noexcept;
-    std::string   devnode() const noexcept;
+    string subsystem() const noexcept;
+    string   devtype() const noexcept;
+    string   syspath() const noexcept;
+    string   sysname() const noexcept;
+    string    sysnum() const noexcept;
+    string   devnode() const noexcept;
 
-    std::string property(const std::string&) const noexcept;
-    std::string driver() const noexcept;
+    string property(const string&) const noexcept;
+    string driver() const noexcept;
     enum action action() const noexcept;
-    std::string sysattr(const std::string&) const noexcept;
-    bool has_tag(const std::string&) const noexcept;
+    string sysattr(const string&) const noexcept;
+    bool has_tag(const string&) const noexcept;
 
 private:
     std::unique_ptr<impl::udev_device, impl::device_delete> dev_;
 
-    explicit device(impl::udev_device* dev) noexcept : dev_(dev) { }
-    device(const udev&, const std::string&);
+    explicit device(impl::udev_device* dev) noexcept : dev_{ dev } { }
+    device(const udev&, const string&);
 
     friend class enumerate;
     friend class monitor;
