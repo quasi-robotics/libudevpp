@@ -40,7 +40,7 @@ namespace udev
 
 ////////////////////////////////////////////////////////////////////////////////
 enumerate::enumerate() : udev_(udev::instance()),
-    enum_(impl::udev_enumerate_new(udev_.get()))
+    enum_{ impl::udev_enumerate_new(udev_.get()) }
 {
     if(!enum_) throw std::system_error{
         std::error_code{ errno, std::generic_category() }
@@ -48,7 +48,7 @@ enumerate::enumerate() : udev_(udev::instance()),
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void enumerate::match_subsystem(const std::string& subsystem)
+void enumerate::match_subsystem(const string& subsystem)
 {
     throw_on(impl::udev_enumerate_add_match_subsystem(
         enum_.get(), subsystem.data()
@@ -56,7 +56,7 @@ void enumerate::match_subsystem(const std::string& subsystem)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void enumerate::nomatch_subsystem(const std::string& subsystem)
+void enumerate::nomatch_subsystem(const string& subsystem)
 {
     throw_on(impl::udev_enumerate_add_nomatch_subsystem(
         enum_.get(), subsystem.data()
@@ -64,7 +64,7 @@ void enumerate::nomatch_subsystem(const std::string& subsystem)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void enumerate::match_sysattr(const std::string& name, const std::string& value)
+void enumerate::match_sysattr(const string& name, const string& value)
 {
     throw_on(impl::udev_enumerate_add_match_sysattr(
         enum_.get(), name.data(), value.size() ? value.data() : nullptr
@@ -72,7 +72,7 @@ void enumerate::match_sysattr(const std::string& name, const std::string& value)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void enumerate::nomatch_sysattr(const std::string& name, const std::string& value)
+void enumerate::nomatch_sysattr(const string& name, const string& value)
 {
     throw_on(impl::udev_enumerate_add_nomatch_sysattr(
         enum_.get(), name.data(), value.size() ? value.data() : nullptr
@@ -80,7 +80,7 @@ void enumerate::nomatch_sysattr(const std::string& name, const std::string& valu
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void enumerate::match_property(const std::string& name, const std::string& value)
+void enumerate::match_property(const string& name, const string& value)
 {
     throw_on(impl::udev_enumerate_add_match_property(
         enum_.get(), name.data(), value.size() ? value.data() : nullptr
@@ -88,7 +88,7 @@ void enumerate::match_property(const std::string& name, const std::string& value
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void enumerate::match_sysname(const std::string& name)
+void enumerate::match_sysname(const string& name)
 {
     throw_on(impl::udev_enumerate_add_match_sysname(
         enum_.get(), name.data()
@@ -96,7 +96,7 @@ void enumerate::match_sysname(const std::string& name)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void enumerate::match_tag(const std::string& name)
+void enumerate::match_tag(const string& name)
 {
     throw_on(impl::udev_enumerate_add_match_tag(
         enum_.get(), name.data()

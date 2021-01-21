@@ -28,6 +28,8 @@ struct enumerate_delete { void operator()(udev_enumerate*); };
 namespace udev
 {
 
+using std::string;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Udev device enumerator.
 //
@@ -45,16 +47,16 @@ public:
     enumerate& operator=(const enumerate&) = delete;
     enumerate& operator=(enumerate&&) noexcept = default;
 
-    void match_subsystem(const std::string&);
-    void nomatch_subsystem(const std::string&);
+    void match_subsystem(const string&);
+    void nomatch_subsystem(const string&);
 
-    void match_sysattr(const std::string& name, const std::string& value = std::string());
-    void nomatch_sysattr(const std::string& name, const std::string& value = std::string());
+    void match_sysattr(const string& name, const string& value = { });
+    void nomatch_sysattr(const string& name, const string& value = { });
 
-    void match_property(const std::string& name, const std::string& value = std::string());
+    void match_property(const string& name, const string& value = { });
 
-    void match_sysname(const std::string&);
-    void match_tag(const std::string&);
+    void match_sysname(const string&);
+    void match_tag(const string&);
 
     void match_parent(const device&);
 
