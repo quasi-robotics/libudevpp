@@ -36,7 +36,7 @@ public:
 
 private:
     std::shared_ptr<impl::udev> udev_;
-    udev(std::shared_ptr<impl::udev> x) : udev_(std::move(x)) { }
+    udev(std::shared_ptr<impl::udev> x) : udev_{ std::move(x) } { }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
