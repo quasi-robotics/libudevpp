@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2017-2020 Dimitry Ishenko
+// Copyright (c) 2017-2021 Dimitry Ishenko
 // Contact: dimitry (dot) ishenko (at) (gee) mail (dot) com
 //
 // Distributed under the GNU GPL license. See the LICENSE.md file for details.
@@ -41,8 +41,9 @@ namespace udev
 {
 
 ////////////////////////////////////////////////////////////////////////////////
-monitor::monitor() : udev_(udev::instance()),
-    mon_{ impl::udev_monitor_new_from_netlink(udev_.get(), "udev") }
+monitor::monitor(udev ctx) :
+    udev_{ std::move(ctx) },
+    mon_{ impl::udev_monitor_new_from_netlink(udev_.get(), "udev::monitor") }
 {
     if(!mon_) throw std::system_error{
         std::error_code{ errno, std::generic_category() }
@@ -86,7 +87,7 @@ device monitor::try_get_for_(const monitor::msec& time)
     };
 
     return fd.events & fd.revents
-        ? device{ impl::udev_monitor_receive_device(mon_.get()) }
+        ? device{ udev_, impl::udev_monitor_receive_device(mon_.get()) }
         : device{ };
 }
 

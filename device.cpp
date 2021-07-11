@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2017-2020 Dimitry Ishenko
+// Copyright (c) 2017-2021 Dimitry Ishenko
 // Contact: dimitry (dot) ishenko (at) (gee) mail (dot) com
 //
 // Distributed under the GNU GPL license. See the LICENSE.md file for details.
@@ -38,13 +38,19 @@ namespace udev
 {
 
 ////////////////////////////////////////////////////////////////////////////////
-device::device(const udev& udev_, const string& path) :
+device::device(udev ctx, const string& path) :
+    udev_{ std::move(ctx) },
     dev_{ impl::udev_device_new_from_syspath(udev_.get(), path.data()) }
 {
     if(!dev_) throw std::system_error{
         std::error_code{ errno, std::generic_category() }
     };
 }
+
+////////////////////////////////////////////////////////////////////////////////
+device::device(udev ctx, impl::udev_device* dev) noexcept :
+    udev_{ std::move(ctx) }, dev_{ dev }
+{ }
 
 ////////////////////////////////////////////////////////////////////////////////
 device device::parent() const noexcept
@@ -55,10 +61,11 @@ device device::parent() const noexcept
     // child's lifetime, so we have to make a "deep copy"
 
     if(dev) dev = impl::udev_device_new_from_syspath(
-        impl::udev_device_get_udev(dev),
+        udev_.get(),
         impl::udev_device_get_syspath(dev)
     );
-    return device{ dev };
+
+    return device{ udev_, dev };
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -73,10 +80,11 @@ device device::parent(const string& subsystem, const string& type) const noexcep
     // so we have to make a "deep copy"
 
     if(dev) dev = impl::udev_device_new_from_syspath(
-        impl::udev_device_get_udev(dev),
+        udev_.get(),
         impl::udev_device_get_syspath(dev)
     );
-    return device{ dev };
+
+    return device{ udev_, dev };
 }
 
 ////////////////////////////////////////////////////////////////////////////////

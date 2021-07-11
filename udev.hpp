@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2017-2020 Dimitry Ishenko
+// Copyright (c) 2017-2021 Dimitry Ishenko
 // Contact: dimitry (dot) ishenko (at) (gee) mail (dot) com
 //
 // Distributed under the GNU GPL license. See the LICENSE.md file for details.
@@ -11,7 +11,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include <memory>
 
-namespace impl { struct udev; }
+////////////////////////////////////////////////////////////////////////////////
+namespace impl
+{
+
+struct udev;
+struct udev_delete { void operator()(udev*); };
+
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace udev
@@ -25,18 +32,20 @@ namespace udev
 class udev
 {
 public:
-    udev(const udev&) noexcept = default;
-    udev(udev&&) noexcept = default;
+    udev() noexcept = default;
 
-    udev& operator=(const udev&) noexcept = default;
+    udev(const udev& rhs) noexcept { *this = rhs; }
+    udev(udev&& rhs) noexcept = default;
+
+    udev& operator=(const udev&) noexcept;
     udev& operator=(udev&&) noexcept = default;
 
-    static udev instance();
     auto get() const noexcept { return udev_.get(); }
 
+    static udev instance();
+
 private:
-    std::shared_ptr<impl::udev> udev_;
-    udev(std::shared_ptr<impl::udev> x) : udev_{ std::move(x) } { }
+    std::unique_ptr<impl::udev, impl::udev_delete> udev_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2017-2020 Dimitry Ishenko
+// Copyright (c) 2017-2021 Dimitry Ishenko
 // Contact: dimitry (dot) ishenko (at) (gee) mail (dot) com
 //
 // Distributed under the GNU GPL license. See the LICENSE.md file for details.
@@ -17,21 +17,35 @@ namespace impl
 // move udev stuff into impl namespace
 #include <libudev.h>
 
+void udev_delete::operator()(udev* x) { udev_unref(x); }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-udev::udev udev::udev::instance()
+namespace udev
 {
-    static std::weak_ptr<impl::udev> weak;
 
-    auto p = weak.lock();
-    if(!p)
-    {
-        p = std::shared_ptr<impl::udev>{ impl::udev_new(), &impl::udev_unref };
-        if(!p) throw std::system_error{
-            std::error_code{ errno, std::generic_category() }
-        };
-        weak = p;
-    }
-    return udev{ std::move(p) };
+////////////////////////////////////////////////////////////////////////////////
+udev& udev::operator=(const udev& rhs) noexcept
+{
+    if(this != &rhs)
+        udev_.reset(rhs.udev_ ? impl::udev_ref(rhs.udev_.get()) : nullptr);
+
+    return *this;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+udev udev::instance()
+{
+    udev ctx;
+
+    ctx.udev_.reset(impl::udev_new());
+    if(!ctx.udev_) throw std::system_error{
+        std::error_code{ errno, std::generic_category() }
+    };
+
+    return ctx;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 }

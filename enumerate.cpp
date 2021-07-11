@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2017-2020 Dimitry Ishenko
+// Copyright (c) 2017-2021 Dimitry Ishenko
 // Contact: dimitry (dot) ishenko (at) (gee) mail (dot) com
 //
 // Distributed under the GNU GPL license. See the LICENSE.md file for details.
@@ -39,7 +39,8 @@ namespace udev
 {
 
 ////////////////////////////////////////////////////////////////////////////////
-enumerate::enumerate() : udev_(udev::instance()),
+enumerate::enumerate(udev ctx) :
+    udev_{ std::move(ctx) },
     enum_{ impl::udev_enumerate_new(udev_.get()) }
 {
     if(!enum_) throw std::system_error{

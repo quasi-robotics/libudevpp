@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2017-2020 Dimitry Ishenko
+// Copyright (c) 2017-2021 Dimitry Ishenko
 // Contact: dimitry (dot) ishenko (at) (gee) mail (dot) com
 //
 // Distributed under the GNU GPL license. See the LICENSE.md file for details.
@@ -41,19 +41,18 @@ using std::string;
 class monitor
 {
 public:
-    monitor();
+    explicit monitor(udev);
 
     monitor(const monitor&) = delete;
-    monitor(monitor&& rhs) noexcept : monitor{ } { swap(rhs); }
+    monitor(monitor&& rhs) noexcept { *this = std::move(rhs); }
 
     monitor& operator=(const monitor&) = delete;
-    monitor& operator=(monitor&& rhs) noexcept { swap(rhs); return (*this); }
-
-    void swap(monitor& rhs) noexcept
+    monitor& operator=(monitor&& rhs) noexcept
     {
         using std::swap;
         swap(udev_, rhs.udev_);
         swap(fd_, rhs.fd_);
+        return *this;
     }
 
     void match_device(const string& subsystem, const string& type = { });
@@ -76,7 +75,7 @@ public:
 private:
     udev udev_;
     std::unique_ptr<impl::udev_monitor, impl::monitor_delete> mon_;
-    int fd_ = -1;
+    int fd_{ -1 };
 
     using msec = std::chrono::milliseconds;
     device try_get_for_(const msec&);
@@ -98,9 +97,6 @@ inline device monitor::try_get_until(const std::chrono::time_point<Clock, Durati
     auto now = Clock::now();
     return try_get_for(tp - (tp < now ? tp : now));
 }
-
-////////////////////////////////////////////////////////////////////////////////
-inline void swap(monitor& lhs, monitor& rhs) noexcept { lhs.swap(rhs); }
 
 ////////////////////////////////////////////////////////////////////////////////
 }

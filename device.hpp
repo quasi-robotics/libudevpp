@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2017-2020 Dimitry Ishenko
+// Copyright (c) 2017-2021 Dimitry Ishenko
 // Contact: dimitry (dot) ishenko (at) (gee) mail (dot) com
 //
 // Distributed under the GNU GPL license. See the LICENSE.md file for details.
@@ -9,6 +9,8 @@
 #define UDEV_DEVICE_HPP
 
 ////////////////////////////////////////////////////////////////////////////////
+#include "udev.hpp"
+
 #include <memory>
 #include <string>
 
@@ -27,11 +29,6 @@ namespace udev
 
 using std::string;
 
-class enumerate;
-class monitor;
-class udev;
-
-////////////////////////////////////////////////////////////////////////////////
 enum action { added, removed, other };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -51,7 +48,7 @@ public:
     device& operator=(const device&) = delete;
     device& operator=(device&& rhs) noexcept = default;
 
-    bool is_valid() const noexcept { return static_cast<bool>(dev_); }
+    bool is_valid() const noexcept { return !!dev_; }
     explicit operator bool() const noexcept { return is_valid(); }
 
     device parent() const noexcept;
@@ -71,10 +68,11 @@ public:
     bool has_tag(const string&) const noexcept;
 
 private:
+    udev udev_;
     std::unique_ptr<impl::udev_device, impl::device_delete> dev_;
 
-    explicit device(impl::udev_device* dev) noexcept : dev_{ dev } { }
-    device(const udev&, const string&);
+    device(udev, const string&);
+    device(udev, impl::udev_device* dev) noexcept;
 
     friend class enumerate;
     friend class monitor;
