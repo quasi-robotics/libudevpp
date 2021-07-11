@@ -79,7 +79,9 @@ capabilities:
 Example #1:
 
 ```cpp
-udev::enumerate enumerate;
+auto ctx = udev::udev::instance();
+
+udev::enumerate enumerate{ ctx };
 enumerate.match_subsystem("block");
 
 auto devices = enumerate.get();
@@ -102,7 +104,9 @@ for(auto const& device : devices)
 
 Example #2:
 ```cpp
-udev::monitor monitor;
+auto ctx = udev::udev::instance();
+
+udev::monitor monitor{ ctx };
 monitor.match_device("block");
 
 for(;;)
