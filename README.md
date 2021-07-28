@@ -16,7 +16,7 @@ Debian/Ubuntu/etc:
 
 ```shell
 $ p=libudev++
-$ v=0.2
+$ v=1.0
 $ wget https://github.com/dimitry-ishenko-cpp/libudevpp/releases/download/v${v}/${p}_${v}_amd64.deb
 $ sudo apt install ./${p}_${v}_amd64.deb
 ```
@@ -25,7 +25,7 @@ Install the development package, if you are planning to develop applications wit
 
 ```shell
 $ p=libudev++-dev
-$ v=0.2
+$ v=1.0
 $ wget https://github.com/dimitry-ishenko-cpp/libudevpp/releases/download/v${v}/${p}_${v}_amd64.deb
 $ sudo apt install ./${p}_${v}_amd64.deb
 ```
@@ -34,7 +34,7 @@ RaspberryPi:
 
 ```shell
 $ p=libudev++
-$ v=0.2
+$ v=1.0
 $ wget https://github.com/dimitry-ishenko-cpp/libudevpp/releases/download/v${v}/${p}_${v}_armhf.deb
 $ sudo apt install ./${p}_${v}_armhf.deb
 ```
@@ -43,7 +43,7 @@ Install the development package, if you are planning to develop applications wit
 
 ```shell
 $ p=libudev++-dev
-$ v=0.2
+$ v=1.0
 $ wget https://github.com/dimitry-ishenko-cpp/libudevpp/releases/download/v${v}/${p}_${v}_armhf.deb
 $ sudo apt install ./${p}_${v}_armhf.deb
 ```
@@ -54,7 +54,7 @@ Stable version (requires [CMake](https://cmake.org/) >= 3.1):
 
 ```shell
 $ p=libudevpp
-$ v=0.2
+$ v=1.0
 $ wget https://github.com/dimitry-ishenko-cpp/${p}/archive/v${v}.tar.gz
 $ tar xzf v${v}.tar.gz
 $ mkdir ${p}-${v}/build
