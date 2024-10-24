@@ -1,88 +1,74 @@
-cmake_minimum_required(VERSION 3.1)
-project(libudev++ VERSION 1.0)
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-set(HEADERS
-    device.hpp
-    enumerate.hpp
-    monitor.hpp
-    udev.hpp
-)
-set(OVERALL_HEADER udev++.hpp)
-
-set(SOURCES
-    device.cpp
-    enumerate.cpp
-    monitor.cpp
-    udev.cpp
-)
+cmake_minimum_required(VERSION 3.15)
+project(udev++ VERSION 1.0.0 DESCRIPTION "udev c++ wrapper" LANGUAGES CXX)
 
 include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 
-########################
-string(REGEX REPLACE "^lib" "" LIBRARY_NAME ${PROJECT_NAME})
-set(PROJECT_NAME_DEV ${PROJECT_NAME}-dev)
-set(CMAKE_INSTALL_DOCDIR_DEV ${CMAKE_INSTALL_DATAROOTDIR}/doc/${PROJECT_NAME_DEV})
+set(CMAKE_VERBOSE_MAKEFILE ON)
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 17)
+endif()
 
-# shared library
-add_library(shared SHARED ${HEADERS} ${SOURCES})
-set_target_properties(shared PROPERTIES OUTPUT_NAME ${LIBRARY_NAME})
-set_target_properties(shared PROPERTIES VERSION ${PROJECT_VERSION})
-set_target_properties(shared PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
-
-install(TARGETS shared DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT shared)
-install(FILES LICENSE.md DESTINATION ${CMAKE_INSTALL_DOCDIR} COMPONENT shared)
-
-# static dev library and headers
-add_library(static STATIC ${HEADERS} ${SOURCES})
-set_target_properties(static PROPERTIES OUTPUT_NAME ${LIBRARY_NAME})
-
-install(TARGETS static DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT static)
-install(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${LIBRARY_NAME} COMPONENT static)
-install(FILES ${OVERALL_HEADER} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT static)
-install(FILES LICENSE.md README.md DESTINATION ${CMAKE_INSTALL_DOCDIR_DEV} COMPONENT static)
-
-########################
-# package
-set(CPACK_STRIP_FILES ON)
-set(CPACK_GENERATOR DEB)
-
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
-    "libudev++: Udev Library for C++."
-)
-set(CPACK_PACKAGE_DESCRIPTION
-    "The libudev++ library is a C++ wrapper for libudev. It enables one to
-enumerate, monitor and introspect devices on the local system."
-)
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER
-    "Dimitry Ishenko <dimitry (dot) ishenko (at) (gee) mail (dot) com>"
-)
-set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
-set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
-
-set(CPACK_DEB_COMPONENT_INSTALL ON)
-
-set(CPACK_DEBIAN_SHARED_PACKAGE_NAME ${PROJECT_NAME})
-set(CPACK_DEBIAN_SHARED_PACKAGE_DEPENDS "libudev1")
-set(CPACK_DEBIAN_SHARED_PACKAGE_SHLIBDEPS ON)
-
-set(CPACK_DEBIAN_STATIC_PACKAGE_NAME ${PROJECT_NAME_DEV})
-set(CPACK_DEBIAN_STATIC_PACKAGE_DEPENDS
-    "${CPACK_DEBIAN_SHARED_PACKAGE_NAME} (= ${PROJECT_VERSION})"
+add_library(${PROJECT_NAME} SHARED
+  src/device.cpp
+  src/enumerate.cpp
+  src/monitor.cpp
+  src/udev.cpp
 )
 
-# source
-set(CPACK_SOURCE_GENERATOR TBZ2 ZIP)
-set(CPACK_SOURCE_PACKAGE_FILE_NAME ${PROJECT_NAME}-${PROJECT_VERSION})
-set(CPACK_SOURCE_IGNORE_FILES /\.git.*;/build.*;\.user$;/\.vscode.*)
+set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
+set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
 
-include(CPack)
-cpack_add_component(shared DESCRIPTION "${CPACK_PACKAGE_DESCRIPTION}")
-cpack_add_component(static DESCRIPTION "${CPACK_PACKAGE_DESCRIPTION}
--
-This package contains headers and static libraries needed for development."
+#target_include_directories(${PROJECT_NAME} PUBLIC include/)
+target_include_directories(${PROJECT_NAME} PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
+)
+
+option(BUILD_EXAMPLES "Build examples" OFF)
+
+if (BUILD_EXAMPLES)
+  add_subdirectory(examples)
+endif()
+
+
+install(
+  DIRECTORY include/
+  DESTINATION include
+)
+
+install(
+  TARGETS ${PROJECT_NAME}
+  EXPORT ${PROJECT_NAME}-targets
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  INCLUDES DESTINATION include
+)
+configure_package_config_file(cmake/${PROJECT_NAME}-config.cmake.in
+    ${PROJECT_NAME}-config.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake
+    COMPATIBILITY ExactVersion
+)
+
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
+
+install(EXPORT ${PROJECT_NAME}-targets
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+    NAMESPACE ${PROJECT_NAME}::
+)
+
+configure_file(cmake/${PROJECT_NAME}.pc.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
+    @ONLY
+)
+
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
 )

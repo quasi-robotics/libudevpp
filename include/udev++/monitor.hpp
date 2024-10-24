@@ -9,8 +9,8 @@
 #define UDEV_MONITOR_HPP
 
 ////////////////////////////////////////////////////////////////////////////////
-#include "device.hpp"
-#include "udev.hpp"
+#include <udev++/device.hpp>
+#include <udev++/udev.hpp>
 
 #include <chrono>
 #include <memory>
@@ -41,7 +41,7 @@ using std::string;
 class monitor
 {
 public:
-    explicit monitor(udev);
+    explicit monitor(udev, const string& mon_group = {"udev"}); // mon_group udev or kernel
 
     monitor(const monitor&) = delete;
     monitor(monitor&& rhs) noexcept { *this = std::move(rhs); }

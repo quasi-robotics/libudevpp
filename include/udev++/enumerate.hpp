@@ -9,8 +9,8 @@
 #define UDEV_ENUMERATE_HPP
 
 ////////////////////////////////////////////////////////////////////////////////
-#include "device.hpp"
-#include "udev.hpp"
+#include <udev++/device.hpp>
+#include <udev++/udev.hpp>
 
 #include <memory>
 #include <string>

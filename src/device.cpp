@@ -5,8 +5,8 @@
 // Distributed under the GNU GPL license. See the LICENSE.md file for details.
 
 ////////////////////////////////////////////////////////////////////////////////
-#include "device.hpp"
-#include "udev.hpp"
+#include <udev++/device.hpp>
+#include <udev++/udev.hpp>
 
 #include <cerrno>
 #include <system_error>
@@ -139,7 +139,7 @@ string device::driver() const noexcept
 enum action device::action() const noexcept
 {
     auto action = str(impl::udev_device_get_action(dev_.get()));
-    return action == "add" ? added : action == "remove" ? removed : other;
+    return action == "add" ? added : action == "remove" ? removed : action == "change" ? changed : other;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

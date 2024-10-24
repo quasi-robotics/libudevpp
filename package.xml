@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="2">
+  <name>udev++</name>
+  <version>1.0.0</version>
+  <description>
+	  udev c++ wrapper
+  </description>
+  <maintainer email="max@quasi.ai">Max D</maintainer>
+  <license>GNU GPL</license>
+
+  <buildtool_depend>cmake</buildtool_depend>
+
+  <export>
+    <build_type>cmake</build_type>
+  </export>
+</package>

@@ -9,7 +9,7 @@
 #define UDEV_DEVICE_HPP
 
 ////////////////////////////////////////////////////////////////////////////////
-#include "udev.hpp"
+#include <udev++/udev.hpp>
 
 #include <memory>
 #include <string>
@@ -29,7 +29,7 @@ namespace udev
 
 using std::string;
 
-enum action { added, removed, other };
+enum action { added, removed, changed, other };
 
 ////////////////////////////////////////////////////////////////////////////////
 // Udev device.

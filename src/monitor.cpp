@@ -5,7 +5,7 @@
 // Distributed under the GNU GPL license. See the LICENSE.md file for details.
 
 ////////////////////////////////////////////////////////////////////////////////
-#include "monitor.hpp"
+#include <udev++/monitor.hpp>
 
 #include <cerrno>
 #include <system_error>
@@ -41,9 +41,9 @@ namespace udev
 {
 
 ////////////////////////////////////////////////////////////////////////////////
-monitor::monitor(udev ctx) :
+monitor::monitor(udev ctx, const string& mon_group) :
     udev_{ std::move(ctx) },
-    mon_{ impl::udev_monitor_new_from_netlink(udev_.get(), "udev::monitor") }
+    mon_{ impl::udev_monitor_new_from_netlink(udev_.get(), mon_group.size() ? mon_group.data() : nullptr) }
 {
     if(!mon_) throw std::system_error{
         std::error_code{ errno, std::generic_category() }
